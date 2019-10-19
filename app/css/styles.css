@@ -1,0 +1,131 @@
+ul.list {
+ padding: 10px;
+ background-color: yellow;
+ list-style-type: none;
+}
+
+li.listItem {
+ padding: 3px;
+ background-color: orange;
+}
+
+body {
+  background-color: #000;
+  color: #fff;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 1.5;
+  padding: 5vh 3vw;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+body {
+/* 	font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: white;
+    overflow: hidden; */
+}
+
+
+.top,
+.middle,
+.indicators {
+  text-align: center;
+  position: relative;
+  height: auto;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  outline: none;
+  text-align: center;
+  color: #fff;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+ display: none; 
+}
+
+.search-input {
+  font-size: 72px;
+  position: relative;
+  z-index: 2;
+}
+
+.search-input::placeholder {
+  color: #323232;
+  grid-area: 1/1;
+}
+
+.search-clear,
+.spinner {
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.search-clear {
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  display: none;
+}
+
+.title {
+  font-size: 1.5em;
+  position: relative;
+  z-index: 1;
+}
+
+.search-hint {
+  position: relative;
+  z-index: 2;
+}
+
+.grid {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: auto;
+  /* place-items: center; doesn't work on iOS*/
+  justify-items: center;
+  align-items: center;
+}
+ 
+.videos {
+  display: none;
+}
+
+video {
+  max-width: 80vw;
+  max-height: 60vh;
+  display: block;
+  box-shadow: 0 0 40px 0px rgba(0, 0, 0, 0.68);
+}
+
+.full-area {
+  grid-area: 1/1;
+}
+
+.spinner {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.loading .spinner{
+ opacity: 1; 
+}
+
+.loading .search-hint, 
+.has-results .title {
+  opacity: 0;
+}
+
+.has-results .search-clear {
+  display: block;
+  opacity: 1;
+}

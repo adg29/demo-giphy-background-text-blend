@@ -1,0 +1,33 @@
+.text-to-life {
+    background:  url('http://giphygifs.s3.amazonaws.com/media/2qN21GvjskNEc/giphy.gif') no-repeat;
+	background-size: cover;
+	-webkit-text-fill-color: rgba(255, 255, 255, 0) ;
+    mix-blend-mode: darken;
+    -webkit-background-clip: text;
+	
+}
+section {
+    background: white;
+}
+
+
+@import url('https://fonts.googleapis.com/css?family=Muli&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Montserrat:700&display=swap');
+
+.text-to-life {
+    background-position: center;
+    background-attachment: fixed;
+    margin: 0;
+
+	overflow: hidden;
+/* 	width: 100vw;
+	height: 100vh; */
+	
+}
+p {
+    font-size: 13px;
+    line-height: 10px;
+	text-align: justify;
+    font-weight: 900;
+	
+}
