@@ -1,0 +1,1 @@
+# giphy-background-text-blend
