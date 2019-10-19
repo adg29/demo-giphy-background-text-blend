@@ -1,5 +1,8 @@
 import { React, useState } from 'react'
+import { useKeyPress } from './hooks/useKeyPress'
 import SearchHint from './SearchHint'
+import {textToLife as TEXT} from 'data/TextToLife' 
+
 import "../css/reset.css"
 import "../css/styles.css"
 import "../css/backgroundBlendText.css"
@@ -9,44 +12,60 @@ import "../css/responsive.css"
 
 const API_KEY = 'lQtrpRDYVbjAzpxqteWznJPbgk05p5P0'
 
-const TEXT = 'LOREM' 
-const canPlayTriggerTextIn = (e) => {
+const canPlayTriggerTextIn = e => {
   document.querySelector('.text-to-life').html(TEXT)  
 }
 
-const handleSearchInput = (event, setSearchStatus, setMessage, setSearchTerm) => {
-  const searchTerm = event.currentTarget.value
+const handleSearchInput = (searchState, setSearchState) => {
+  const searchTerm = searchState.term
   
   if (searchTerm.length > 0) {
-    setSearchStatus('results')
-    setSearchTerm(searchTerm)
-    fetchSearchResults(searchTerm, setMessage)  
+    setSearchState({
+      status: 'input',
+      term: searchTerm,
+      ...searchState
+    })
+    fetchSearchResults(searchState, setSearchState)  
   } else {
-    setMessage('too-short')
+    setSearchState({
+      message: 'too-short',
+      ...searchState
+    })  
   }
 }
 
-const fetchSearchResults = (searchTerm, setMessage) => {
-  showLoading(true)
-  
-  searchGiphy(searchTerm)
+const fetchSearchResults = (searchState, setSearchState) => {
+  setSearchState({
+    loading: true,
+    ...searchState
+  })  
+
+  searchGiphy(searchState, setSearchState)
   .then(json => {
     if (json.data.length > 0) {
       const videoSRC = selectRandomGif(json.data)
       displayGif(videoSRC)
-      setMessage('search-more')
+      setSearchState({
+        message: 'search-more',
+        ...searchState
+      })  
+    
     } else {
       throw new Error();
     }
   })
   .catch(error => {
-    setMessage('no-results')
-    showLoading(false)
+    setSearchState({
+      message: 'no-results',
+      loading: false,
+      ...searchState
+    })  
+
   });
 }
 
-const searchGiphy = (searchTerm, setMessage) => {  
-  return fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchTerm}&limit=50&offset=0&rating=PG-13&lang=en`)
+const searchGiphy = (searchState, setSearchState) => {  
+  return fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`)
   .then(response => {
     if (response.status === 200) {
       return response.json()
@@ -55,8 +74,11 @@ const searchGiphy = (searchTerm, setMessage) => {
     }
   })
   .catch(error => {
-    setMessage('connection-down')
-    showLoading(false)
+    setSearchState({
+      message: 'connection-down',
+      loading: false,
+      ...searchState
+    })
   });
 };
 
@@ -66,7 +88,7 @@ const selectRandomGif = gifs => {
 }
 
 
-const displayGif = src => {
+const displayGif = (src, setLoadingStatus) => {
   const video = createVideo(src)
   videosEl.style.display = 'grid'
   videosEl.appendChild(video)
@@ -90,7 +112,7 @@ const displayGif = src => {
   video.addEventListener('loadeddata', event => {
     video.classList.add('visible')
     document.body.classList.add('has-results')
-    showLoading(false)
+    setLoadingStatus(false)
   }) 
   
   video.muted = true
@@ -120,58 +142,47 @@ const clearSearch = event => {
   searchInputEl.focus()
 }
 
-// Event handlers for deciding to run a search query
-document.addEventListener('keyup', event => {
-  if (event.key === 'Enter') {
-    searchInputEl.blur()
-    handleSearchInput(event)
-  }
-});
 
-// Event handlers for rerunning a search query
-videosEl.addEventListener('click', handleSearchInput);
-searchHintMobileEl.addEventListener('click', handleSearchInput);
-
-clearSearchEl.addEventListener('click', clearSearch);
-
-document.addEventListener('keyup', event => {
-  if(event.key === 'Escape') {
-    clearSearch();
-  }
-});
 
 // The only reason we have the form tag is to enable the Enter button to be renamed Search on iOS, so we block the form from taking its action when clicked. 
-formEl.addEventListener('submit', event => { 
-  event.preventDefault()
-});
-      
 
-
-/* takes an array prop 'items' and returns a <ul> element 
-   with each item as <li> elements. Also demos importing styles. */
 const Search = ({}) => {
-  let [searchStatus, setSearchStatus] = useState(null)
-  let [message, setMessage] = useState()
-  let [searchTerm, setSearchTerm] = useState('')
-  let [loadingStatus, setLoadingStatus] = useState(true)
+  let [searchState, setSearchState] = useState({
+    status: null,
+    message: null,
+    term: '',
+    loading: true
+  })
+  
+  const escapePress = useKeyPress('Escape')
+  const enterPress = useKeyPress('Enter')
+  
+  if (escapePress) {
+    clearSearch()
+  }
+  
+  if (enterPress) {
+    searchInputEl.blur()
+    handleSearchInput(searchState, setSearchState)
+  }
   
   return (
   
-  <div className={loadingStatus && 'loading'}>
+  <div className={searchState.loadingStatus && 'loading'}>
     <section>
       <p class="text-to-life"></p>
     </section>
 
     <div class="top grid">
       <h1 class="title full-area">Jiffy GIF Search</h1>
-      <a class="search-clear full-area">
+      <a class="search-clear full-area" onClick={clearSearch}>
         <img src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" />
       </a>
     </div>
 
     <div class="middle grid">
-      <form class="full-area" action="">
-        {searchStatus !== 'results' && (
+      <form class="full-area" onSubmit={e => e.preventDefault}>
+        {searchState.status !== 'results' && (
           <input
           class="search-input full-area"
           placeholder="Type something"
@@ -179,7 +190,7 @@ const Search = ({}) => {
           />
         )}
       </form>
-      <div class="videos grid full-area"></div>
+      <div class="videos grid full-area" onClick={handleSearchInput}></div>
     </div>
 
     <div class="indicators grid">
@@ -189,8 +200,8 @@ const Search = ({}) => {
       />
 
       
-      <SearchHint screen='mobile' message={message} searchTerm={searchTerm}/>
-      <SearchHint screen='desktop' message={message} searchTerm={searchTerm}/>
+      <SearchHint screen='mobile' searchState={searchState} handleSearchInput={handleSearchInput}/>
+      <SearchHint screen='desktop' searchState={searchState}/>
     </div>
   </div>
   

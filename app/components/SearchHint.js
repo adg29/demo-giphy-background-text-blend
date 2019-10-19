@@ -13,10 +13,10 @@ const updateSearchHint = (message, searchTerm = '') => {
 }
       
 
-const SearchHint = ({screen, message, searchTerm}) => {
+const SearchHint = ({screen, searchState, handleSearchInput}) => {
   return (
-    <span className={`search-hint full-area ${screen}`}>
-      {updateSearchHint(message)}
+    <span className={`search-hint full-area ${screen}`} onClick={screen === 'mobile' ? handleSearchInput : () => {}}>
+      {updateSearchHint(searchState.message)}
     </span>
   )
 }
