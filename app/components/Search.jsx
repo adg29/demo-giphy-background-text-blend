@@ -1,6 +1,8 @@
-import { React, useState } from 'react'
+import { React, useState, useEffect } from 'react'
 import { useKeyPress } from './hooks/useKeyPress'
 import SearchHint from './SearchHint'
+import GiphyVideo from './GiphyVideo'
+
 import {textToLife as TEXT} from 'data/TextToLife' 
 
 import "../css/reset.css"
@@ -12,12 +14,8 @@ import "../css/responsive.css"
 
 const API_KEY = 'lQtrpRDYVbjAzpxqteWznJPbgk05p5P0'
 
-const canPlayTriggerTextIn = e => {
-  document.querySelector('.text-to-life').html(TEXT)  
-}
-
-const handleSearchInput = (searchState, setSearchState) => {
-  const searchTerm = searchState.term
+const handleSearchInput = (event, searchState, setSearchState) => {
+  const searchTerm = event.currentTarget.value
   
   if (searchTerm.length > 0) {
     setSearchState({
@@ -28,7 +26,7 @@ const handleSearchInput = (searchState, setSearchState) => {
     fetchSearchResults(searchState, setSearchState)  
   } else {
     setSearchState({
-      message: 'too-short',
+      status: 'too-short',
       ...searchState
     })  
   }
@@ -41,27 +39,27 @@ const fetchSearchResults = (searchState, setSearchState) => {
   })  
 
   searchGiphy(searchState, setSearchState)
-  .then(json => {
-    if (json.data.length > 0) {
-      const videoSRC = selectRandomGif(json.data)
-      displayGif(videoSRC)
+    .then(json => {
+      if (json.data.length > 0) {
+        const videoSRC = selectRandomGif(json.data)
+        displayGif(videoSRC)
+        setSearchState({
+          status: 'search-more',
+          ...searchState
+        })  
+
+      } else {
+        throw new Error();
+      }
+    })
+    .catch(error => {
       setSearchState({
-        message: 'search-more',
+        status: 'no-results',
+        loading: false,
         ...searchState
       })  
-    
-    } else {
-      throw new Error();
-    }
-  })
-  .catch(error => {
-    setSearchState({
-      message: 'no-results',
-      loading: false,
-      ...searchState
-    })  
 
-  });
+    });
 }
 
 const searchGiphy = (searchState, setSearchState) => {  
@@ -75,7 +73,7 @@ const searchGiphy = (searchState, setSearchState) => {
   })
   .catch(error => {
     setSearchState({
-      message: 'connection-down',
+      status: 'connection-down',
       loading: false,
       ...searchState
     })
@@ -88,15 +86,18 @@ const selectRandomGif = gifs => {
 }
 
 
-const displayGif = (src, setLoadingStatus) => {
-  const video = createVideo(src)
-  videosEl.style.display = 'grid'
-  videosEl.appendChild(video)
-  videosEl.addEventListener('canplay', canPlayTriggerTextIn)
+const displayGif = (src, setSearchState, searchResults, setSearchResults) => {
+  setSearchResults({
+    srcList: [...searchResults.srcList, src],
+    ...searchResults
+  })
+  // const video = createVideo(src)
+  // videosEl.style.display = 'grid'
+  // videosEl.appendChild(video)
   
   // We don't want too many videos playing at once, as the performance degrades 
   // (and new videos can't be played on iOS)
-  if (document.querySelectorAll('video').length > 6) {
+  if (searchResults.videoStack.length > 6) {
     /* We need to do the following: 
     1. firstly reset the video URL, and then reload it, to free up hardware 
     resources (per this post: https://bugs.webkit.org/show_bug.cgi?id=162366#c32)
@@ -108,94 +109,129 @@ const displayGif = (src, setLoadingStatus) => {
     disableVideo.setAttribute('src','')
     disableVideo.load()
   }
-  
-  video.addEventListener('loadeddata', event => {
-    video.classList.add('visible')
-    document.body.classList.add('has-results')
-    setLoadingStatus(false)
-  }) 
-  
-  video.muted = true
-  video.playsInline = true
-  video.play()
+
 }
-
-const createVideo = src => {
-  const videoEl = document.createElement('video')
-
-  videoEl.src = src
-  videoEl.autoplay = true
-  videoEl.loop = true
-  videoEl.classList.add('full-area')
-  
-  return videoEl
-}
-
-const clearSearch = event => {
-  document.body.classList.remove('has-results')
-  
-  videosEl.innerHTML = ''
-  updateSearchHint('clear')
-  searchInputEl.style.display = 'inline-block'
-  searchInputEl.value = ''
-  
-  searchInputEl.focus()
-}
-
 
 
 // The only reason we have the form tag is to enable the Enter button to be renamed Search on iOS, so we block the form from taking its action when clicked. 
 
 const Search = ({}) => {
   let [searchState, setSearchState] = useState({
+    loading: false,
     status: null,
-    message: null,
     term: '',
-    loading: true
+    classList: []
+  })
+  
+  let [searchResults, setSearchResults] = useState({
+    videoStack: [],
+    srcList: [],
+    text: TEXT
   })
   
   const escapePress = useKeyPress('Escape')
   const enterPress = useKeyPress('Enter')
   
-  if (escapePress) {
-    clearSearch()
+  const clearSearch = event => {
+    setSearchState({
+      status: 'clear',
+      ...searchState
+    })
   }
-  
-  if (enterPress) {
-    searchInputEl.blur()
-    handleSearchInput(searchState, setSearchState)
-  }
+
+  // document.body.classList.remove('has-results')
+  // searchInputEl.style.display = 'inline-block'
+  // searchInputEl.value = ''
+  // searchInputEl.focus()      
+  useEffect(() => {
+    if (searchState.status === "clear") {
+      setSearchResults({
+        videoStack: [],
+        srcList: []
+      })           
+      
+      setSearchState({
+        term: '',
+        ...searchState
+      })
+    }
+  }, searchState.status)
+
+  useEffect(() => {
+    this.refs.searchInputRef.blur()
+    handleSearchInput(searchState, setSearchState)  
+  }, [enterPress])
+
+  useEffect(() => {
+    setSearchState({
+      status: 'clear',
+      ...searchState
+    })
+  }, [escapePress])
+
+  useEffect(() => {
+    let classListAggregate = []
+    searchState.loading 
+      && classListAggregate.push('loading')
+    searchState.status === 'clear' 
+      && classListAggregate.push('has-results')
+    
+    setSearchState({
+      classList: classListAggregate.join(' '),
+      ...searchState
+    })
+  }, [searchState.loading, searchState.status])
   
   return (
   
-  <div className={searchState.loadingStatus && 'loading'}>
+  <div className={searchState.classList}>
     <section>
-      <p class="text-to-life"></p>
+      <p className="text-to-life">
+        {searchResults.text}
+      </p>
     </section>
 
-    <div class="top grid">
-      <h1 class="title full-area">Jiffy GIF Search</h1>
-      <a class="search-clear full-area" onClick={clearSearch}>
-        <img src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" />
+    <div className="top grid">
+      <h1 className="title full-area">Giphy Search</h1>
+      <a 
+        className="search-clear full-area" 
+        onClick={clearSearch}
+      >
+          <img src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" />
       </a>
     </div>
 
-    <div class="middle grid">
-      <form class="full-area" onSubmit={e => e.preventDefault}>
-        {searchState.status !== 'results' && (
-          <input
-          class="search-input full-area"
-          placeholder="Type something"
-          type="search"
-          />
-        )}
+    <div className="middle grid">
+      <form 
+        className="full-area" 
+        onSubmit={e => e.preventDefault}
+      >
+        {
+          searchState.status !== 'search-more' && 
+            (
+              <input 
+                className="search-input full-area"          
+                value={searchState.term}
+                ref="searchInputRef"
+                placeholder="Type something"
+                type="search"
+              />
+            )
+        }
       </form>
-      <div class="videos grid full-area" onClick={handleSearchInput}></div>
+      <div 
+        className="videos grid full-area" 
+        onClick={handleSearchInput}
+      >
+        {searchResults.videoStack.map(v => {
+          return v
+        })}
+      </div>
     </div>
 
-    <div class="indicators grid">
+    <div className="indicators grid">
       <img
-        class="spinner full-area"
+        className="spinner full-area"
         src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Foval.svg?1531225500673"
       />
 

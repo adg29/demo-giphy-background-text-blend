@@ -1,22 +1,30 @@
-const updateSearchHint = (message, searchTerm = '') => {
-  if (message === "no-results") { 
-    return `No results for ${searchTerm}`
-  } else if (message === "search-more") {
-    return `Tap to search for more ${searchTerm}`
-  } else if (message === "clear") { 
-    return ''
-  } else if (message === "connection-down") {
-    return `Sorry, we can't seem to connect to Giphy. Try later!`
-  } else if (message === "too-short") {
-    return `Can't search for nothing!`
-  }
-}
-      
+import { useState, useEffect } from 'react'
 
 const SearchHint = ({screen, searchState, handleSearchInput}) => {
+
+  const [hint, setHint] = useState('')
+  
+  useEffect(() => {
+    // message, searchTerm = ''
+    if (searchState.status === "no-results") { 
+      setHint(`No results for ${searchState.term}`)
+    } else if (searchState.status === "search-more") {
+      setHint(`Tap to search for more ${searchState.term}`)
+    } else if (searchState.status === "clear") { 
+      setHint(`''`)
+    } else if (searchState.status === "connection-down") {
+      setHint(`Sorry, we can't seem to connect to Giphy. Try later!`)
+    } else if (searchState.status === "too-short") {
+      setHint(`Can't search for nothing!`)
+    }
+  }, [searchState.status])
+
+  
   return (
     <span className={`search-hint full-area ${screen}`} onClick={screen === 'mobile' ? handleSearchInput : () => {}}>
-      {updateSearchHint(searchState.message)}
+      {hint}
     </span>
   )
 }
+
+export default SearchHint
