@@ -19,23 +19,23 @@ const handleSearchInput = (event, searchState, setSearchState) => {
   
   if (searchTerm.length > 0) {
     setSearchState({
+      ...searchState,
       status: 'input',
-      term: searchTerm,
-      ...searchState
+      term: searchTerm
     })
     fetchSearchResults(searchState, setSearchState)  
   } else {
     setSearchState({
-      status: 'too-short',
-      ...searchState
+      ...searchState,
+      status: 'too-short'
     })  
   }
 }
 
 const fetchSearchResults = (searchState, setSearchState) => {
   setSearchState({
-    loading: true,
-    ...searchState
+    ...searchState,
+    loading: true
   })  
 
   searchGiphy(searchState, setSearchState)
@@ -44,8 +44,8 @@ const fetchSearchResults = (searchState, setSearchState) => {
         const videoSRC = selectRandomGif(json.data)
         displayGif(videoSRC)
         setSearchState({
-          status: 'search-more',
-          ...searchState
+          ...searchState,          
+          status: 'search-more'
         })  
 
       } else {
@@ -54,9 +54,9 @@ const fetchSearchResults = (searchState, setSearchState) => {
     })
     .catch(error => {
       setSearchState({
+        ...searchState,        
         status: 'no-results',
-        loading: false,
-        ...searchState
+        loading: false
       })  
 
     });

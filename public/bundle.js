@@ -32875,7 +32875,7 @@ exports.default = HelloWorld;
 /* 20 */
 /***/ (function(module, exports) {
 
-throw new Error("Module build failed: SyntaxError: Unexpected token (24:6)\n\n  22 |       status: 'input',\n  23 |       term: searchTerm,\n> 24 |       ...searchState\n     |       ^\n  25 |     })\n  26 |     fetchSearchResults(searchState, setSearchState)  \n  27 |   } else {\n");
+throw new Error("Module build failed: SyntaxError: Unexpected token (22:6)\n\n  20 |   if (searchTerm.length > 0) {\n  21 |     setSearchState({\n> 22 |       ...searchState,\n     |       ^\n  23 |       status: 'input',\n  24 |       term: searchTerm\n  25 |     })\n");
 
 /***/ })
 /******/ ]);
