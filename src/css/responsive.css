@@ -1,0 +1,35 @@
+.videos {
+  width: 100%;
+  padding: 24px;
+}
+
+.search-input {
+  width: 94vw;
+  line-height: 1;
+  height: 88px;
+}
+
+.search-hint.mobile {
+  display:none;
+}
+
+@media (max-width: 480px) {
+
+  body {
+    font-size: 18px;
+    min-height: 85vh;
+  }
+  
+  .search-input {
+    font-size: 32px;
+  }
+  
+  .search-hint.mobile {
+    display:block;
+  }
+  
+  .search-hint.desktop {
+    display: none;
+  }
+  
+}
