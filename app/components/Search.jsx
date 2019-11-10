@@ -12,6 +12,13 @@ import "../css/backgroundBlendText.css";
 import "../css/transitions.css";
 import "../css/responsive.css";
 
+const AppContext = React.createContext({
+  loading: false,
+  status: null,
+  term: "",
+  classList: []
+});
+
 const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 
 const handleSearchInput = (event, searchState, setSearchState) => {
