@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useEffect, useContext } from "react";
 import { useKeyPress } from "../hooks/useKeyPress";
 
 import SearchHint from "./SearchHint";
@@ -12,12 +12,7 @@ import "../css/backgroundBlendText.css";
 import "../css/transitions.css";
 import "../css/responsive.css";
 
-const AppContext = React.createContext({
-  loading: false,
-  status: null,
-  term: "",
-  classList: []
-});
+import { SearchContext } from './SearchContext'
 
 const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 
@@ -120,6 +115,8 @@ const displayGif = (src, setSearchState, searchResults, setSearchResults) => {
 // The only reason we have the form tag is to enable the Enter button to be renamed Search on iOS, so we block the form from taking its action when clicked.
 
 const Search = ({}) => {
+  const [state, setState] = useContext(SearchContext)
+  
   let [searchState, setSearchState] = useState({
     loading: false,
     status: null,
