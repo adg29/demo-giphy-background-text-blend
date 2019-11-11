@@ -1,8 +1,9 @@
-import { React, useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { SearchContext }  from './SearchContext'
 
 const GiphyVideo = ({ src, muted, playsInline }) => {
-  const videoRef = null
+  console.log(src)
+  const videoRef = useRef(null)
   const [classList, setClassList] = useState(["full-area"]);
 
   const [searchState, setSearchState] = useContext(SearchContext)
@@ -10,44 +11,45 @@ const GiphyVideo = ({ src, muted, playsInline }) => {
   const canPlayTrigger = e => {
     // document.querySelector('.text-to-life').html(TEXT)
   };
-  
-  useEffect(() => {
-    videoRef.addEventListener("loadeddata", event => {
-      videoRef.classList.add("visible");
-      setSearchState({
-        classList: `${classList} has-results`,
-        loading: false,
-        ...searchState
-      });
+ 
+  const videoLoadedData = event => {
+    videoRef.current.classList.add("visible");
+    setSearchState({
+      ...searchState,
+      classList: `${classList} has-results`,
+      loading: false
     });
+  }
 
-    videoRef.play();
+  useEffect(() => {
+    videoRef.current.addEventListener("loadeddata", videoLoadedData);
 
-    return videoRef.removeEventListener("loadeddata")
+    videoRef.current.play();
+
+    return videoRef.current.removeEventListener("loadeddata", videoLoadedData)
   }, []);
 
   useEffect(() => {
-    if (searchState.videoStack.length > 6) {
-      videoRef.setAttribute("src", "");
-      videoRef.load();
+    if (searchState.srcList.length > 6) {
+      videoRef.current.setAttribute("src", "");
+      videoRef.current.load();
     }
-  }, [searchState.videoStack]);
+  }, [searchState.srcList]);
 
 
   return (
     <video
-      ref={ref => videoRef = ref}
+      ref={videoRef}
       className={classList.join(" ")}
       onCanPlay={canPlayTrigger}
-      autoPlay={"true"}
-      loop={"true"}
+      autoPlay={true}
+      loop={true}
+      src={src}
       muted
       playsInline
-      src
-      ref
     ></video>
   );
 
 };
 
-export default GiphyVideo;
+export default GiphyVideo

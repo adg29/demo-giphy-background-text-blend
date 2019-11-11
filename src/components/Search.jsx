@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import useKeyPress from "../hooks/useKeyPress";
 
 import SearchHint from "./SearchHint";
@@ -24,7 +24,7 @@ const selectRandomGif = gifs => {
 const Search = ({}) => {
   const [searchState, setSearchState] = useContext(SearchContext)
 
-  let searchInputRef = null
+  let searchInputRef = useRef(null)
 
   const escapePress = useKeyPress("Escape");
   const enterPress = useKeyPress("Enter");
@@ -65,14 +65,11 @@ const Search = ({}) => {
   useEffect(() => {
     if (searchState.status === "clear") {
       setSearchState({
-        videoStack: [],
-        srcList: []
-      });
-      setSearchState({
         ...searchState,
+        srcList: [],
         term: ""
       });
-      searchInputRef.focus();
+      searchInputRef.current.focus();
     } else if (searchState.status === 'search-submit') {
       if (searchState.term.length > 0) {
         setSearchState({
@@ -86,10 +83,7 @@ const Search = ({}) => {
               let searchResultSrc = selectRandomGif(json.data);
               setSearchState({
                 ...searchState,
-                srcList: [...searchState.srcList, searchResultSrc]
-              });
-              setSearchState({
-                ...searchState,
+                srcList: [...searchState.srcList, searchResultSrc],
                 result: searchResultSrc,
                 status: "search-more"
               });
@@ -114,7 +108,7 @@ const Search = ({}) => {
   }, [searchState.status]);
 
   useEffect(() => {
-    searchInputRef.blur();
+    searchInputRef.current.blur();
     setSearchState({
       ...searchState,
       status: "search-submit"
@@ -148,7 +142,10 @@ const Search = ({}) => {
       <div className="top grid">
         <h1 className="title full-area">Giphy Search</h1>
         <a className="search-clear full-area" onClick={clearSearch}>
-          <img src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" />
+          <img 
+            alt="Clear results"
+            src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" 
+          />
         </a>
       </div>
 
@@ -157,7 +154,7 @@ const Search = ({}) => {
           {searchState.status !== "search-more" && (
             <input
               className="search-input full-area"
-              ref={ref => searchInputRef = ref}
+              ref={searchInputRef}
               placeholder="Type something"
               value={searchState.term}
               onChange={e => setSearchState({
@@ -169,23 +166,26 @@ const Search = ({}) => {
           )}
         </form>
         <div className="videos grid full-area">
-          {searchState.videoStack.map(v => {
-            return v;
-          })}
+          {searchState.srcList.map((src, i) => (
+            <GiphyVideo 
+              src={src}
+              key={i}
+            />
+          ))}
         </div>
       </div>
 
       <div className="indicators grid">
         <img
+          alt="Loading results..."
           className="spinner full-area"
           src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Foval.svg?1531225500673"
         />
 
         <SearchHint
           screen="mobile"
-          searchState={searchState}
         />
-        <SearchHint screen="desktop" searchState={searchState} />
+        <SearchHint screen="desktop"/>
       </div>
     </div>
   );

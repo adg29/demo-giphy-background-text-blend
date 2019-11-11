@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { SearchContext } from './SearchContext'
 
-const SearchHint = ({ screen, searchState}) => {
+const SearchHint = ({ screen }) => {
+  const [searchState, setSearchState] = useContext(SearchContext)
   const [hint, setHint] = useState("");
 
   const handleMobileSearchInput = () => {
