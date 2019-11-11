@@ -5,13 +5,11 @@ const SearchHint = ({ screen }) => {
   const [searchState, setSearchState] = useContext(SearchContext)
   const [hint, setHint] = useState("");
 
-  const handleMobileSearchInput = (e) => {
-    if (screen === "mobile") {
-      setSearchState({
-        ...searchState,
-        status: 'search-submit'
-      })
-    }
+  const triggerSearchClick = (e) => {
+    setSearchState({
+      ...searchState,
+      status: 'search-submit'
+    })
   }
 
   useEffect(() => {
@@ -32,7 +30,7 @@ const SearchHint = ({ screen }) => {
   return (
     <span
       className={`search-hint full-area ${screen}`}
-      onClick={handleMobileSearchInput}
+      onClick={triggerSearchClick}
     >
       {hint}
     </span>

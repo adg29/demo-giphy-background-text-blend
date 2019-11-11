@@ -29,10 +29,6 @@ const Search = ({}) => {
   const escapePress = useKeyPress("Escape");
   const enterPress = useKeyPress("Enter");
 
-  useEffect(() => {
-    // videosEl.style.display = 'grid'
-  }, [searchState.srcList])
-
   const clearSearch = event => {
     setSearchState({
       ...searchState,
