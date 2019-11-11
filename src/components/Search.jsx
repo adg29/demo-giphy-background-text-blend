@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import useKeyPress from "../hooks/useKeyPress";
 
 import SearchHint from "./SearchHint";
@@ -16,146 +16,109 @@ import { SearchContext } from './SearchContext'
 
 const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 
-const fetchSearchResults = (searchState, setSearchState) => {
-  setSearchState({
-    ...searchState,
-    loading: true
-  });
-
-  searchGiphy(searchState, setSearchState)
-    .then(json => {
-      if (json.data.length > 0) {
-        const videoSRC = selectRandomGif(json.data);
-        displayGif(videoSRC);
-        setSearchState({
-          ...searchState,
-          status: "search-more"
-        });
-      } else {
-        throw new Error();
-      }
-    })
-    .catch(error => {
-      setSearchState({
-        ...searchState,
-        status: "no-results",
-        loading: false
-      });
-    });
-};
-
-const searchGiphy = (searchState, setSearchState) => {
-  return fetch(
-    `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`
-  )
-    .then(response => {
-      if (response.status === 200) {
-        return response.json();
-      } else {
-        throw new Error(response);
-      }
-    })
-    .catch(error => {
-      setSearchState({
-        status: "connection-down",
-        loading: false,
-        ...searchState
-      });
-    });
-};
-
 const selectRandomGif = gifs => {
   const randomIndex = Math.floor(Math.random() * gifs.length);
   return gifs[randomIndex].images.original.mp4;
 };
-
-const displayGif = (src, setSearchState, searchResults, setSearchResults) => {
-  setSearchResults({
-    srcList: [...searchResults.srcList, src],
-    ...searchResults
-  });
-  // const video = createVideo(src)
-  // videosEl.style.display = 'grid'
-  // videosEl.appendChild(video)
-
-  // We don't want too many videos playing at once, as the performance degrades
-  // (and new videos can't be played on iOS)
-  if (searchResults.videoStack.length > 6) {
-    /* We need to do the following: 
-    1. firstly reset the video URL, and then reload it, to free up hardware 
-    resources (per this post: https://bugs.webkit.org/show_bug.cgi?id=162366#c32)
-    2. We don't want to then remove videos, because it changes the orientation of the video 
-    stack (due to the nth-child CSS rule) - so we only look for videos where the src is not 
-    blank (to make sure we don't select a video that we already disabled).*/
-
-    const disableVideo = document.querySelector('video[src]:not([src=""])');
-    disableVideo.setAttribute("src", "");
-    disableVideo.load();
-  }
-};
-
-// The only reason we have the form tag is to enable the Enter button to be renamed Search on iOS, so we block the form from taking its action when clicked.
 
 const Search = ({}) => {
   const [searchState, setSearchState] = useContext(SearchContext)
 
   let searchInputRef = null
 
-  let [searchResults, setSearchResults] = useState({
-    videoStack: [],
-    srcList: [],
-    text: TEXT
-  });
-
   const escapePress = useKeyPress("Escape");
   const enterPress = useKeyPress("Enter");
 
+  useEffect(() => {
+    // videosEl.style.display = 'grid'
+  }, [searchState.srcList])
+
   const clearSearch = event => {
     setSearchState({
-      status: "clear",
-      ...searchState
+      ...searchState,
+      status: "clear"
     });
   };
 
-  const handleSearchInput = (event) => {
-    const searchTerm = event.currentTarget.value;
-  
-    if (searchTerm.length > 0) {
-      setSearchState({
-        ...searchState,
-        status: "input",
-        term: searchTerm
+  const searchGiphy = () => {
+    return fetch(
+      `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`
+    )
+      .then(response => {
+        if (response.status === 200) {
+          return response.json();
+        } else {
+          throw new Error(response);
+        }
+      })
+      .catch(error => {
+        setSearchState({
+          ...searchState,
+          status: "connection-down",
+          loading: false
+        });
       });
-      fetchSearchResults(searchState, setSearchState);
-    } else {
-      setSearchState({
-        ...searchState,
-        status: "too-short"
-      });
-    }
   };
 
   // document.body.classList.remove('has-results')
   // searchInputEl.style.display = 'inline-block'
-  // searchInputEl.value = ''
-  // searchInputEl.focus()
   useEffect(() => {
     if (searchState.status === "clear") {
-      setSearchResults({
+      setSearchState({
         videoStack: [],
         srcList: []
       });
-
       setSearchState({
-        term: "",
-        ...searchState
+        ...searchState,
+        term: ""
       });
+      searchInputRef.focus();
+    } else if (searchState.status === 'search-submit') {
+      if (searchState.term.length > 0) {
+        setSearchState({
+          ...searchState,
+          loading: true
+        });
+
+        searchGiphy()
+          .then(json => {
+            if (json.data.length > 0) {
+              let searchResultSrc = selectRandomGif(json.data);
+              setSearchState({
+                ...searchState,
+                srcList: [...searchState.srcList, searchResultSrc]
+              });
+              setSearchState({
+                ...searchState,
+                result: searchResultSrc,
+                status: "search-more"
+              });
+            } else {
+              throw new Error();
+            }
+          })
+          .catch(error => {
+            setSearchState({
+              ...searchState,
+              status: "no-results",
+              loading: false
+            });
+          });
+      } else {
+        setSearchState({
+          ...searchState,
+          status: "too-short"
+        });
+      }
     }
-  }, searchState.status);
+  }, [searchState.status]);
 
   useEffect(() => {
     searchInputRef.blur();
-    // handleSearchInput(searchState, setSearchState);
+    setSearchState({
+      ...searchState,
+      status: "search-submit"
+    });
   }, [enterPress]);
 
   useEffect(() => {
@@ -178,9 +141,9 @@ const Search = ({}) => {
 
   return (
     <div className={searchState.classList}>
-      <section>
-        <p className="text-to-life">{searchResults.text}</p>
-      </section>
+      {/* <section>
+        <p className="text-to-life">{TEXT}</p>
+      </section> */}
 
       <div className="top grid">
         <h1 className="title full-area">Giphy Search</h1>
@@ -190,19 +153,23 @@ const Search = ({}) => {
       </div>
 
       <div className="middle grid">
-        <form className="full-area" onSubmit={e => e.preventDefault}>
+        <form className="full-area" onSubmit={e => e.preventDefault()}>
           {searchState.status !== "search-more" && (
             <input
               className="search-input full-area"
-              value={searchState.term}
               ref={ref => searchInputRef = ref}
               placeholder="Type something"
+              value={searchState.term}
+              onChange={e => setSearchState({
+                ...searchState,
+                term: e.currentTarget.value
+              })}
               type="search"
             />
           )}
         </form>
-        <div className="videos grid full-area" onClick={handleSearchInput}>
-          {searchResults.videoStack.map(v => {
+        <div className="videos grid full-area">
+          {searchState.videoStack.map(v => {
             return v;
           })}
         </div>
@@ -217,7 +184,6 @@ const Search = ({}) => {
         <SearchHint
           screen="mobile"
           searchState={searchState}
-          handleSearchInput={handleSearchInput}
         />
         <SearchHint screen="desktop" searchState={searchState} />
       </div>

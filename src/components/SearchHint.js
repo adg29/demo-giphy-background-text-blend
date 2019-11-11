@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 
-const SearchHint = ({ screen, searchState, handleSearchInput }) => {
+const SearchHint = ({ screen, searchState}) => {
   const [hint, setHint] = useState("");
+
+  const handleMobileSearchInput = () => {
+
+  }
 
   useEffect(() => {
     // message, searchTerm = ''
@@ -21,7 +25,7 @@ const SearchHint = ({ screen, searchState, handleSearchInput }) => {
   return (
     <span
       className={`search-hint full-area ${screen}`}
-      onClick={screen === "mobile" ? handleSearchInput : () => {}}
+      onClick={screen === "mobile" ? handleMobileSearchInput : () => {}}
     >
       {hint}
     </span>

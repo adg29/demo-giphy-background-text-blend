@@ -7,7 +7,10 @@ const SearchProvider = props => {
     loading: false,
     status: null,
     term: "",
-    classList: []    
+    result: null,
+    classList: [],
+    videoStack: [],
+    srcList: []
   })
   return ( 
     <SearchContext.Provider value={[state, setState]}>

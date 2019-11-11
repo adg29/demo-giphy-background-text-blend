@@ -11,9 +11,6 @@ const GiphyVideo = ({ src, muted, playsInline }) => {
     // document.querySelector('.text-to-life').html(TEXT)
   };
   
-  // displayGif, createVideo, after (searchResults.videoStack.length > 6)
-  // video.muted = true
-  // video.playsInline = true
   useEffect(() => {
     videoRef.addEventListener("loadeddata", event => {
       videoRef.classList.add("visible");
@@ -28,6 +25,13 @@ const GiphyVideo = ({ src, muted, playsInline }) => {
 
     return videoRef.removeEventListener("loadeddata")
   }, []);
+
+  useEffect(() => {
+    if (searchState.videoStack.length > 6) {
+      videoRef.setAttribute("src", "");
+      videoRef.load();
+    }
+  }, [searchState.videoStack]);
 
 
   return (
