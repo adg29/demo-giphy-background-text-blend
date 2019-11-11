@@ -12,18 +12,9 @@ const GiphyVideo = ({ src, muted, playsInline }) => {
     setClassList([...classList, "visible"]);
     setSearchState({
       ...searchState,
-      classList: [...searchState.classList, 'has-results'],
       loading: false
     });
   }
-
-  useEffect(() => {
-    if (searchState.srcList.length > 6) {
-      videoRef.current.setAttribute("src", "");
-      videoRef.current.load();
-    }
-  }, [searchState.srcList]);
-
 
   return (
     <video

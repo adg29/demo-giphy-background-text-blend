@@ -36,7 +36,9 @@ const Search = ({}) => {
   const clearSearch = event => {
     setSearchState({
       ...searchState,
-      status: "clear"
+      status: "clear",
+      srcList: [],
+      term: ""
     });
   };
 
@@ -62,10 +64,8 @@ const Search = ({}) => {
 
   useEffect(() => {
     if (searchState.status === "clear") {
-      let classListUpdated = searchState.classList.filter(c => c !== "has-results")
       setSearchState({
         ...searchState,
-        classList: classListUpdated,
         srcList: [],
         term: ""
       });
@@ -123,19 +123,8 @@ const Search = ({}) => {
     });
   }, [escapePress]);
 
-  useEffect(() => {
-    let classListUpdated = [...searchState.classList]
-    searchState.loading && classListUpdated.push("loading")
-    searchState.status === "clear" && classListUpdated.push("has-results")
-
-    setSearchState({
-      ...searchState,
-      classList: classListUpdated
-    });
-  }, [searchState.loading, searchState.status]);
-
   return (
-    <div className={searchState.classList.join(" ")}>
+    <div className={searchState.srcList && 'has-results'}>
       {/* <section>
         <p className="text-to-life">{TEXT}</p>
       </section> */}
@@ -151,25 +140,24 @@ const Search = ({}) => {
       </div>
 
       <div className="middle grid">
-        <form className="full-area" onSubmit={e => e.preventDefault()}>
-          {searchState.status !== "search-more" && (
-            <input
-              className="search-input full-area"
-              ref={searchInputRef}
-              placeholder="Type something"
-              value={searchState.term}
-              onChange={e => setSearchState({
-                ...searchState,
-                term: e.currentTarget.value
-              })}
-              type="search"
-            />
-          )}
+        <form className="full-area" onSubmit={e => e.preventDefault()}>      
+        <input
+          style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
+          className="search-input full-area"
+          ref={searchInputRef}
+          placeholder="Type something"
+          value={searchState.term}
+          onChange={e => setSearchState({
+            ...searchState,
+            term: e.currentTarget.value
+          })}
+          type="search"
+        />
         </form>
         <div className="videos grid full-area" style={{display: searchState.srcList.length ? 'grid' : ''}}>
           {searchState.srcList.map((src, i) => (
             <GiphyVideo 
-              src={src}
+              src={i > 6 && i === 0 ? '' : src}
               key={i}
             />
           ))}
