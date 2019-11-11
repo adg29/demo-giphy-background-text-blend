@@ -5,8 +5,13 @@ const SearchHint = ({ screen }) => {
   const [searchState, setSearchState] = useContext(SearchContext)
   const [hint, setHint] = useState("");
 
-  const handleMobileSearchInput = () => {
-
+  const handleMobileSearchInput = (e) => {
+    if (screen === "mobile") {
+      setSearchState({
+        ...searchState,
+        status: 'search-submit'
+      })
+    }
   }
 
   useEffect(() => {
@@ -16,7 +21,7 @@ const SearchHint = ({ screen }) => {
     } else if (searchState.status === "search-more") {
       setHint(`Tap to search for more ${searchState.term}`);
     } else if (searchState.status === "clear") {
-      setHint(`''`);
+      setHint(``);
     } else if (searchState.status === "connection-down") {
       setHint(`Sorry, we can't seem to connect to Giphy. Try later!`);
     } else if (searchState.status === "too-short") {
@@ -27,7 +32,7 @@ const SearchHint = ({ screen }) => {
   return (
     <span
       className={`search-hint full-area ${screen}`}
-      onClick={screen === "mobile" ? handleMobileSearchInput : () => {}}
+      onClick={handleMobileSearchInput}
     >
       {hint}
     </span>

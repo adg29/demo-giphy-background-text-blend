@@ -37,9 +37,12 @@ const Search = ({}) => {
     setSearchState({
       ...searchState,
       status: "clear",
+      loading: false,
       srcList: [],
       term: ""
     });
+    searchInputRef.current.style.display = 'inline-block'
+    searchInputRef.current.focus();
   };
 
   const searchGiphy = () => {
@@ -63,15 +66,7 @@ const Search = ({}) => {
   };
 
   useEffect(() => {
-    if (searchState.status === "clear") {
-      setSearchState({
-        ...searchState,
-        srcList: [],
-        term: ""
-      });
-      searchInputRef.current.style.display = 'inline-block'
-      searchInputRef.current.focus();
-    } else if (searchState.status === 'search-submit') {
+    if (searchState.status === 'search-submit') {
       if (searchState.term.length > 0) {
         setSearchState({
           ...searchState,
@@ -117,14 +112,11 @@ const Search = ({}) => {
   }, [enterPress]);
 
   useEffect(() => {
-    setSearchState({
-      status: "clear",
-      ...searchState
-    });
+    clearSearch()
   }, [escapePress]);
 
   return (
-    <div className={searchState.srcList && 'has-results'}>
+    <div className={searchState.srcList.length ? 'has-results': ''}>
       {/* <section>
         <p className="text-to-life">{TEXT}</p>
       </section> */}
@@ -168,13 +160,10 @@ const Search = ({}) => {
       <div className="indicators grid">
         <img
           alt="Loading results..."
-          className="spinner full-area"
+          className={`spinner full-area ${searchState.loading && ('visible')}`}
           src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Foval.svg?1531225500673"
         />
-
-        <SearchHint
-          screen="mobile"
-        />
+        <SearchHint screen="mobile" />
         <SearchHint screen="desktop"/>
       </div>
     </div>
