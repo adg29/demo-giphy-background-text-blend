@@ -1,20 +1,26 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { SearchContext }  from './SearchContext'
 
-const GiphyVideo = ({ src, muted, playsInline }) => {
+const GiphyVideo = ({ src, resultIndex }) => {
   const videoRef = useRef()
   const [classList, setClassList] = useState(["full-area"]);
 
   const [searchState, setSearchState] = useContext(SearchContext)
 
   const videoLoadedData = event => {
-    console.log('videoLoaded')
     setClassList([...classList, "visible"]);
     setSearchState({
       ...searchState,
       loading: false
     });
   }
+
+  useEffect(() => {
+    if (resultIndex < searchState.srcList.length - 6) {
+      videoRef.current.src = ''
+      videoRef.current.load()
+    }
+  }, [searchState.srcList])
 
   return (
     <video
@@ -24,8 +30,8 @@ const GiphyVideo = ({ src, muted, playsInline }) => {
       loop={true}
       src={src}
       onLoadedData={videoLoadedData}
-      muted
-      playsInline
+      muted={true}
+      playsInline={true}
     ></video>
   );
 

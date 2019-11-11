@@ -155,9 +155,10 @@ const Search = ({}) => {
         />
         </form>
         <div className="videos grid full-area" style={{display: searchState.srcList.length ? 'grid' : ''}}>
-          {searchState.srcList.map((src, i) => (
+          {searchState.srcList.map((giphySrc, i) => (
             <GiphyVideo 
-              src={i > 6 && i === 0 ? '' : src}
+              src={(i < searchState.srcList.length - 6) ? '' : giphySrc}
+              resultIndex={i}
               key={i}
             />
           ))}
