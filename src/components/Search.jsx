@@ -24,7 +24,7 @@ const selectRandomGif = gifs => {
 const Search = ({}) => {
   const [searchState, setSearchState] = useContext(SearchContext)
 
-  let searchInputRef = useRef(null)
+  let searchInputRef = useRef()
 
   const escapePress = useKeyPress("Escape");
   const enterPress = useKeyPress("Enter");
@@ -60,15 +60,16 @@ const Search = ({}) => {
       });
   };
 
-  // document.body.classList.remove('has-results')
-  // searchInputEl.style.display = 'inline-block'
   useEffect(() => {
     if (searchState.status === "clear") {
+      let classListUpdated = searchState.classList.filter(c => c !== "has-results")
       setSearchState({
         ...searchState,
+        classList: classListUpdated,
         srcList: [],
         term: ""
       });
+      searchInputRef.current.style.display = 'inline-block'
       searchInputRef.current.focus();
     } else if (searchState.status === 'search-submit') {
       if (searchState.term.length > 0) {
@@ -123,18 +124,18 @@ const Search = ({}) => {
   }, [escapePress]);
 
   useEffect(() => {
-    let classListAggregate = [];
-    searchState.loading && classListAggregate.push("loading");
-    searchState.status === "clear" && classListAggregate.push("has-results");
+    let classListUpdated = [...searchState.classList]
+    searchState.loading && classListUpdated.push("loading")
+    searchState.status === "clear" && classListUpdated.push("has-results")
 
     setSearchState({
-      classList: classListAggregate.join(" "),
-      ...searchState
+      ...searchState,
+      classList: classListUpdated
     });
   }, [searchState.loading, searchState.status]);
 
   return (
-    <div className={searchState.classList}>
+    <div className={searchState.classList.join(" ")}>
       {/* <section>
         <p className="text-to-life">{TEXT}</p>
       </section> */}
@@ -165,7 +166,7 @@ const Search = ({}) => {
             />
           )}
         </form>
-        <div className="videos grid full-area">
+        <div className="videos grid full-area" style={{display: searchState.srcList.length ? 'grid' : ''}}>
           {searchState.srcList.map((src, i) => (
             <GiphyVideo 
               src={src}
