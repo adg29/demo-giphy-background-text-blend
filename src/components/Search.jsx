@@ -4,8 +4,6 @@ import useKeyPress from "../hooks/useKeyPress";
 import SearchHint from "./SearchHint";
 import GiphyVideo from "./GiphyVideo";
 
-import TEXT from "../data/TextToLife";
-
 import "../css/reset.css";
 import "../css/styles.css";
 import "../css/backgroundBlendText.css";
@@ -21,7 +19,7 @@ const selectRandomGif = gifs => {
   return gifs[randomIndex].images.original.mp4;
 };
 
-const Search = ({}) => {
+const Search = () => {
   const [searchState, setSearchState] = useContext(SearchContext)
 
   let searchInputRef = useRef()
@@ -41,25 +39,6 @@ const Search = ({}) => {
     searchInputRef.current.focus();
   };
 
-  const searchGiphy = () => {
-    return fetch(
-      `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`
-    )
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
-        } else {
-          throw new Error(response);
-        }
-      })
-      .catch(error => {
-        setSearchState({
-          ...searchState,
-          status: "connection-down",
-          loading: false
-        });
-      });
-  };
 
   useEffect(() => {
     if (searchState.status === 'search-submit') {
@@ -68,6 +47,26 @@ const Search = ({}) => {
           ...searchState,
           loading: true
         });
+
+        const searchGiphy = () => {
+          return fetch(
+            `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`
+          )
+            .then(response => {
+              if (response.status === 200) {
+                return response.json();
+              } else {
+                throw new Error(response);
+              }
+            })
+            .catch(error => {
+              setSearchState({
+                ...searchState,
+                status: "connection-down",
+                loading: false
+              });
+            });
+        };
 
         searchGiphy()
           .then(json => {
@@ -100,11 +99,13 @@ const Search = ({}) => {
   }, [searchState.status]);
 
   useEffect(() => {
-    searchInputRef.current.blur();
-    setSearchState({
-      ...searchState,
-      status: "search-submit"
-    });
+    if (enterPress) {
+      searchInputRef.current.blur();
+      setSearchState({
+        ...searchState,
+        status: "search-submit"
+      });
+    }
   }, [enterPress]);
 
   useEffect(() => {
