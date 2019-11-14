@@ -4,11 +4,16 @@ import { useState, useEffect } from 'react'
 function useKeyPress(targetKey) {
   // State for keeping track of whether key is pressed
   const [keyPressed, setKeyPressed] = useState(false);
+  let prevKey = '';
 
   // If pressed key is our target key then set to true
   function downHandler({ key }) {
+    // prevent re-render
+    if (prevKey === targetKey) return;
+
     if (key === targetKey) {
       setKeyPressed(true);
+      prevKey = key;
     }
   }
 
@@ -16,6 +21,7 @@ function useKeyPress(targetKey) {
   const upHandler = ({ key }) => {
     if (key === targetKey) {
       setKeyPressed(false);
+      prevKey = '';
     }
   };
 
