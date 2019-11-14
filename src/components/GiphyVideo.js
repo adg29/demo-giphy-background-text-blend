@@ -20,7 +20,7 @@ const GiphyVideo = ({ src, resultIndex }) => {
       videoRef.current.src = ''
       videoRef.current.load()
     }
-  }, [searchState.srcList])
+  }, [searchState.srcList, resultIndex])
 
   return (
     <video

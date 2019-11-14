@@ -25,7 +25,7 @@ const SearchHint = ({ screen }) => {
     } else if (searchState.status === "too-short") {
       setHint(`Can't search for nothing!`);
     }
-  }, [searchState.status]);
+  }, [searchState.status, searchState.term]);
 
   return (
     <span
