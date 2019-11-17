@@ -1,8 +1,8 @@
-import React, { useContext, useState, useEffect } from "react";
-import { SearchContext } from './SearchContext'
+import React, { useState, useEffect } from "react";
+import { useSearch } from './SearchContext'
 
 const SearchHint = ({ screen }) => {
-  const [searchState, setSearchState] = useContext(SearchContext)
+  const [searchState, setSearchState] = useSearch()
   const [hint, setHint] = useState("");
 
   const triggerSearchClick = (e) => {

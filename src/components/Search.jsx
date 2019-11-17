@@ -10,7 +10,7 @@ import "../css/backgroundBlendText.css";
 import "../css/transitions.css";
 import "../css/responsive.css";
 
-import { SearchContext } from './SearchContext'
+import { useSearch } from './SearchContext'
 
 const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 
@@ -20,7 +20,7 @@ const selectRandomGif = gifs => {
 };
 
 const Search = () => {
-  const [searchState, setSearchState] = useContext(SearchContext)
+  const [searchState, setSearchState] = useSearch()
 
   let searchInputRef = useRef()
 
@@ -123,7 +123,7 @@ const Search = () => {
         <a className="search-clear full-area" onClick={clearSearch}>
           <img 
             alt="Clear results"
-            src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Fclose.svg?1531225500180" 
+            src="../assets/close.svg"
           />
         </a>
       </div>
@@ -158,7 +158,7 @@ const Search = () => {
         <img
           alt="Loading results..."
           className={`spinner full-area ${searchState.loading && ('visible')}`}
-          src="https://cdn.glitch.com/d958e7c2-3d1d-458e-8320-75c6b8c173d3%2Foval.svg?1531225500673"
+          src="../assets/oval.svg"
         />
         <SearchHint screen="mobile" />
         <SearchHint screen="desktop"/>

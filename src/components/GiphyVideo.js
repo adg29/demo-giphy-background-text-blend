@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import { SearchContext }  from './SearchContext'
+import React, { useState, useEffect, useRef } from "react";
+import { useSearch }  from './SearchContext'
 
 const GiphyVideo = ({ src, resultIndex }) => {
   const videoRef = useRef()
   const [classList, setClassList] = useState(["full-area"]);
 
-  const [searchState, setSearchState] = useContext(SearchContext)
+  const [searchState, setSearchState] = useSearch()
 
   const videoLoadedData = event => {
     setClassList([...classList, "visible"]);
