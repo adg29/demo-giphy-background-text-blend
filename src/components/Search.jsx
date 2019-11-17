@@ -17,10 +17,10 @@ const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 const selectRandomGif = gifs => {
   const randomIndex = Math.floor(Math.random() * gifs.length);
   return gifs[randomIndex].images.original.mp4;
-};
+}
 
 const Search = () => {
-  const [searchState, setSearchState] = useSearch()
+  const [searchState, dispatch] = useSearch()
 
   let searchInputRef = useRef()
 
@@ -28,83 +28,55 @@ const Search = () => {
   const enterPress = useKeyPress("Enter");
 
   const clearSearch = event => {
-    setSearchState({
-      ...searchState,
-      status: "clear",
-      loading: false,
-      srcList: [],
-      term: ""
-    });
     searchInputRef.current.style.display = 'inline-block'
-    searchInputRef.current.focus();
+    searchInputRef.current.focus()
+    dispatch({type: 'CLEAR'})
   };
 
 
   useEffect(() => {
     if (searchState.status === 'search-submit') {
       if (searchState.term.length > 0) {
-        setSearchState({
-          ...searchState,
-          loading: true
-        });
-
-        const searchGiphy = () => {
-          return fetch(
-            `https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`
-          )
-            .then(response => {
-              if (response.status === 200) {
-                return response.json();
-              } else {
-                throw new Error(response);
-              }
-            })
-            .catch(error => {
-              setSearchState({
-                ...searchState,
-                status: "connection-down",
-                loading: false
-              });
-            });
+        dispatch({type: 'LOADING'})
+        const searchGiphy = async () => {
+          try {
+            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`);
+            if (response.status === 200) {
+              return response.json();
+            }
+            else {
+              throw new Error(response);
+            }
+          }
+          catch (error) {
+            dispatch({ type: 'CONNECTION_DOWN' });
+          }
         };
 
         searchGiphy()
           .then(json => {
             if (json.data.length > 0) {
               let searchResultSrc = selectRandomGif(json.data);
-              setSearchState({
-                ...searchState,
-                srcList: [...searchState.srcList, searchResultSrc],
-                result: searchResultSrc,
-                status: "search-more"
-              });
+              dispatch({type: 'RESULT_SET', payload: {
+                result: searchResultSrc
+              }})
             } else {
               throw new Error();
             }
           })
           .catch(error => {
-            setSearchState({
-              ...searchState,
-              status: "no-results",
-              loading: false
-            });
-          });
+            dispatch({type: 'NO_RESULT'});
+          })
       } else {
-        setSearchState({
-          ...searchState,
-          status: "too-short"
-        });
+        dispatch({type: 'TERM_TOO_SHORT'});
       }
     }
   }, [searchState.status]);
 
   useEffect(() => {
     if (enterPress) {
-      searchInputRef.current.blur();
-      setSearchState({
-        ...searchState,
-        status: "search-submit"
-      });
+      searchInputRef.current.blur()
+      dispatch({type: 'TERM_SUBMIT'})
     }
   }, [enterPress]);
 
@@ -136,10 +108,9 @@ const Search = () => {
           ref={searchInputRef}
           placeholder="Type something"
           value={searchState.term}
-          onChange={e => setSearchState({
-            ...searchState,
+          onChange={e => dispatch({type: 'TERM_SET', payload: {
             term: e.currentTarget.value
-          })}
+          }})}
           type="search"
         />
         </form>
