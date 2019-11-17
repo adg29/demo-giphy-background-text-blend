@@ -1,6 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
-const SearchContext = React.createContext([{}, () => {}]);
+const SearchContext = React.createContext();
+
+const useSearch = () => {
+  const context = useContext(SearchContext)
+  
+  if(!context) {
+    throw new Error(`useSearch must be used within a SearchProvider`)
+  }
+
+  return context
+}
 
 const SearchProvider = props => {
   const [state, setState] = useState({
@@ -12,11 +22,11 @@ const SearchProvider = props => {
     videoStack: [],
     srcList: []
   })
+
+  const value = React.useMemo(() => [state, setState], [state])
   return ( 
-    <SearchContext.Provider value={[state, setState]}>
-      {props.children}
-    </SearchContext.Provider>
+    <SearchContext.Provider value={value} {...props} />
   );
 };
 
-export { SearchContext, SearchProvider };
+export { useSearch, SearchProvider };
