@@ -27,11 +27,11 @@ const Search = () => {
   const escapePress = useKeyPress("Escape");
   const enterPress = useKeyPress("Enter");
 
-  const clearSearch = event => {
+  const clearSearch = React.useCallback(event => {
     searchInputRef.current.style.display = 'inline-block'
     searchInputRef.current.focus()
     dispatch({type: 'CLEAR'})
-  };
+  }, [dispatch]);
 
 
   useEffect(() => {
@@ -71,18 +71,18 @@ const Search = () => {
         dispatch({type: 'TERM_TOO_SHORT'});
       }
     }
-  }, [searchState.status]);
+  }, [searchState.status, searchState.term, dispatch]);
 
   useEffect(() => {
     if (enterPress) {
       searchInputRef.current.blur()
       dispatch({type: 'TERM_SUBMIT'})
     }
-  }, [enterPress]);
+  }, [enterPress, dispatch]);
 
   useEffect(() => {
     clearSearch()
-  }, [escapePress]);
+  }, [escapePress, clearSearch]);
 
   return (
     <div className={searchState.srcList.length ? 'has-results': ''}>
@@ -92,7 +92,7 @@ const Search = () => {
 
       <div className="top grid">
         <h1 className="title full-area">Giphy Search</h1>
-        <a className="search-clear full-area" onClick={clearSearch}>
+        <a href="#clear" className="search-clear full-area" onClick={clearSearch}>
           <img 
             alt="Clear results"
             src="../assets/close.svg"
