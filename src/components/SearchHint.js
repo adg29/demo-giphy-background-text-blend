@@ -2,14 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useSearch } from './SearchContext'
 
 const SearchHint = ({ screen }) => {
-  const [searchState, setSearchState] = useSearch()
+  const {searchState, dispatch} = useSearch()
   const [hint, setHint] = useState("");
 
   const triggerSearchClick = (e) => {
-    setSearchState({
-      ...searchState,
-      status: 'search-submit'
-    })
+    dispatch({type: 'TERM_SUBMIT'})
   }
 
   useEffect(() => {

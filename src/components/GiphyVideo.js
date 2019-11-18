@@ -5,14 +5,11 @@ const GiphyVideo = ({ src, resultIndex }) => {
   const videoRef = useRef()
   const [classList, setClassList] = useState(["full-area"]);
 
-  const [searchState, setSearchState] = useSearch()
+  const {searchState, dispatch} = useSearch()
 
   const videoLoadedData = event => {
     setClassList([...classList, "visible"]);
-    setSearchState({
-      ...searchState,
-      loading: false
-    });
+    dispatch({type: 'LOADING_DONE'})
   }
 
   useEffect(() => {
