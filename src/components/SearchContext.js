@@ -19,6 +19,12 @@ const searchReducer = (searchState, action) => {
         loading: true
       }
     }
+    case 'LOADING_DONE': {
+      return {
+        ...searchState,
+        loading: false
+      }
+    }
     case 'CONNECTION_DOWN': {
       return {
         ...searchState,
@@ -71,16 +77,16 @@ const useSearch = () => {
     throw new Error(`useSearch must be used within a SearchProvider`)
   }
 
-  const [state, dispatch] = context
+  const [searchState, dispatch] = context
 
   return {
-    state,
+    searchState,
     dispatch
   }
 }
 
 const SearchProvider = props => {
-  const [state, dispatch] = useReducer(searchReducer, {
+  const [searchState, dispatch] = useReducer(searchReducer, {
     loading: false,
     status: null,
     term: "",
@@ -90,7 +96,7 @@ const SearchProvider = props => {
     srcList: []
   })
 
-  const value = React.useMemo(() => [state, dispatch], [state])
+  const value = React.useMemo(() => [searchState, dispatch], [searchState])
   return ( 
     <SearchContext.Provider value={value} {...props} />
   );

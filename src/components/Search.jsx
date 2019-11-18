@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import useKeyPress from "../hooks/useKeyPress";
 
 import SearchHint from "./SearchHint";
@@ -20,7 +20,7 @@ const selectRandomGif = gifs => {
 }
 
 const Search = () => {
-  const [searchState, dispatch] = useSearch()
+  const {searchState, dispatch} = useSearch()
 
   let searchInputRef = useRef()
 
