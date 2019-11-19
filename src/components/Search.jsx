@@ -103,18 +103,21 @@ const Search = () => {
       <div className="middle grid">
         <form className="full-area" onSubmit={e => e.preventDefault()}>      
         <input
-          style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
           className="search-input full-area"
+          style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
           ref={searchInputRef}
-          placeholder="Type something"
           value={searchState.term}
           onChange={e => dispatch({type: 'TERM_SET', payload: {
             term: e.currentTarget.value
           }})}
           type="search"
+          placeholder="Type something"
         />
         </form>
-        <div className="videos grid full-area" style={{display: searchState.srcList.length ? 'grid' : ''}}>
+        <div 
+          className="videos grid full-area" 
+          style={{display: searchState.srcList.length ? 'grid' : ''}}
+        >
           {searchState.srcList.map((giphySrc, i) => (
             <GiphyVideo 
               src={(i < searchState.srcList.length - 6) ? '' : giphySrc}
