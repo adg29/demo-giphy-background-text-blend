@@ -120,7 +120,7 @@ const Search = () => {
         >
           {searchState.srcList.map((giphySrc, i) => (
             <GiphyVideo 
-              src={(i < searchState.srcList.length - 6) ? '' : giphySrc}
+              src={giphySrc}
               resultIndex={i}
               key={i}
             />
