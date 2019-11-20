@@ -68,6 +68,7 @@ const Search = () => {
             dispatch({type: 'NO_RESULT'});
           })
       } else {
+        searchInputRef.current.focus()
         dispatch({type: 'TERM_TOO_SHORT'});
       }
     }
