@@ -100,18 +100,19 @@ const Search = () => {
 
       <div className="middle grid">
         <form className="full-area" onSubmit={preventDefault}>      
-        <input
-          className="search-input full-area"
-          style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
-          ref={searchInputRef}
-          value={searchState.term}
-          onChange={e => dispatch({type: 'TERM_SET', payload: {
-            term: e.currentTarget.value
-          }})}
-          type="search"
-          placeholder="Type something"
-        />
+          <input
+            className="search-input full-area"
+            style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
+            ref={searchInputRef}
+            value={searchState.term}
+            onChange={e => dispatch({type: 'TERM_SET', payload: {
+              term: e.currentTarget.value
+            }})}
+            type="search"
+            placeholder="Type something"
+          />
         </form>
+
         <div 
           className="videos grid full-area" 
           style={{display: searchState.srcList.length ? 'grid' : ''}}
