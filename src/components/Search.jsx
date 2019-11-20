@@ -6,7 +6,6 @@ import GiphyVideo from "./GiphyVideo";
 
 import "../css/reset.css";
 import "../css/styles.css";
-import "../css/backgroundBlendText.css";
 import "../css/transitions.css";
 import "../css/responsive.css";
 
@@ -87,10 +86,6 @@ const Search = () => {
 
   return (
     <div className={searchState.srcList.length ? 'has-results': ''}>
-      {/* <section>
-        <p className="text-to-life">{TEXT}</p>
-      </section> */}
-
       <div className="top grid">
         <h1 className="title full-area">Giphy Search</h1>
         <a href="#clear" className="search-clear full-area" onClick={clearSearch}>
