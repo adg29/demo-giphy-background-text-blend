@@ -133,7 +133,6 @@ const Search = () => {
           className={`spinner full-area ${searchState.loading && ('visible')}`}
           src="../assets/oval.svg"
         />
-        <SearchHint screen="mobile" />
         <SearchHint screen="desktop"/>
       </div>
     </div>
