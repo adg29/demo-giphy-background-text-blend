@@ -90,7 +90,6 @@ const SearchProvider = props => {
     loading: false,
     status: null,
     term: "",
-    result: null,
     classList: [],
     videoStack: [],
     srcList: []
