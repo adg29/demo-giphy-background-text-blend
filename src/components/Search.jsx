@@ -84,6 +84,8 @@ const Search = () => {
     clearSearch()
   }, [escapePress, clearSearch]);
 
+  const preventDefault = e => e.preventDefault()
+
   return (
     <div className={searchState.srcList.length ? 'has-results': ''}>
       <div className="top grid">
@@ -97,7 +99,7 @@ const Search = () => {
       </div>
 
       <div className="middle grid">
-        <form className="full-area" onSubmit={e => e.preventDefault()}>      
+        <form className="full-area" onSubmit={preventDefault}>      
         <input
           className="search-input full-area"
           style={{display: searchState.status !== "search-more" ? 'inline-block': 'none'}}
