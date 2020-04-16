@@ -4,6 +4,8 @@ import useKeyPress from "../hooks/useKeyPress";
 import SearchHint from "./SearchHint";
 import GiphyVideo from "./GiphyVideo";
 
+import searchGiphy from "./FetchApi"
+
 import "../css/reset.css";
 import "../css/styles.css";
 import "../css/backgroundBlendText.css";
@@ -12,7 +14,6 @@ import "../css/responsive.css";
 
 import { useSearch } from './SearchContext'
 
-const API_KEY = "lQtrpRDYVbjAzpxqteWznJPbgk05p5P0";
 
 const selectRandomGif = gifs => {
   const randomIndex = Math.floor(Math.random() * gifs.length);
@@ -38,22 +39,14 @@ const Search = () => {
     if (searchState.status === 'search-submit') {
       if (searchState.term.length > 0) {
         dispatch({type: 'LOADING'})
-        const searchGiphy = async () => {
-          try {
-            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${searchState.term}&limit=50&offset=0&rating=PG-13&lang=en`);
-            if (response.status === 200) {
-              return response.json();
-            }
-            else {
-              throw new Error(response);
-            }
-          }
-          catch (error) {
-            dispatch({ type: 'CONNECTION_DOWN' });
-          }
-        };
-
-        searchGiphy()
+        let giphyResponse = null
+        try {
+          giphyResponse = searchGiphy(searchState.term)
+        } catch (error) {
+          dispatch({ type: 'CONNECTION_DOWN' });
+        }
+        
+        giphyResponse
           .then(json => {
             if (json.data.length > 0) {
               let searchResultSrc = selectRandomGif(json.data);
@@ -117,7 +110,7 @@ const Search = () => {
         <div className="videos grid full-area" style={{display: searchState.srcList.length ? 'grid' : ''}}>
           {searchState.srcList.map((giphySrc, i) => (
             <GiphyVideo 
-              src={(i < searchState.srcList.length - 6) ? '' : giphySrc}
+              src={giphySrc}
               resultIndex={i}
               key={i}
             />
